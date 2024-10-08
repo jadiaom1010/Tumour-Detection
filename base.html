@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection & Chatbot</title>
+    <style>
+        /* Basic styles for chatbot */
+        #chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            background-color: #fff;
+            display: none; /* Initially hidden */
+        }
+        #chatbot-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        #chatbot-body {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #chat-input {
+            display: flex;
+            padding: 10px;
+        }
+        #user-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #send-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Your existing content -->
+
+<div id="chatbot">
+    <div id="chatbot-header">Chatbot</div>
+    <div id="chatbot-body"></div>
+    <div id="chat-input">
+        <input type="text" id="user-input" placeholder="Ask me something..." />
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<button id="toggle-chatbot">Chat with us!</button>
+
+<script>
+    document.getElementById('toggle-chatbot').onclick = function() {
+        const chatbot = document.getElementById('chatbot');
+        chatbot.style.display = chatbot.style.display === 'none' ? 'block' : 'none';
+    };
+
+    document.getElementById('send-button').onclick = function() {
+        const userInput = document.getElementById('user-input').value;
+        if (userInput) {
+            // Display user message
+            const chatBody = document.getElementById('chatbot-body');
+            chatBody.innerHTML += `<div><strong>You:</strong> ${userInput}</div>`;
+
+            // Send user input to Flask backend
+            fetch('/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ question: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display chatbot response
+                chatBody.innerHTML += `<div><strong>Bot:</strong> ${data.answer}</div>`;
+                document.getElementById('user-input').value = ''; // Clear input field
+                chatBody.scrollTop = chatBody.scrollHeight; // Auto-scroll to the bottom
+            });
+        }
+    };
+</script>
+
+</body>
+</html>
